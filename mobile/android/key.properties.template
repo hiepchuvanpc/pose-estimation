@@ -1,0 +1,8 @@
+# Key Properties Template
+# Copy this file to key.properties and fill in your values
+# NEVER commit key.properties to Git!
+
+storePassword=YOUR_STORE_PASSWORD
+keyPassword=YOUR_KEY_PASSWORD
+keyAlias=motion-coach
+storeFile=../keystore/motion-coach-release.jks

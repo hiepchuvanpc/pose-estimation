@@ -1,0 +1,695 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Motion Coach - Test Web PC</title>
+  <style>
+    :root {
+      --bg: #f2f0e8;
+      --panel: #fffef9;
+      --ink: #1e2431;
+      --muted: #5f6673;
+      --line: #d7cfbf;
+      --primary: #136f63;
+      --primary-2: #0a4f7a;
+      --danger: #9b5e08;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Tahoma", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 0%, #fff7d6 0%, transparent 40%),
+        radial-gradient(circle at 90% 100%, #def4ff 0%, transparent 45%),
+        var(--bg);
+      min-height: 100vh;
+    }
+
+    .page {
+      width: min(1180px, 94vw);
+      margin: 22px auto 36px;
+    }
+
+    .hero {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: linear-gradient(120deg, #f5ffdf, #ecf6ff);
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+
+    .hero h1 {
+      margin: 0 0 6px;
+      font-size: 24px;
+    }
+
+    .hero p {
+      margin: 0 0 10px;
+      color: var(--muted);
+    }
+
+    .pill {
+      display: inline-block;
+      margin-right: 8px;
+      margin-bottom: 6px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      color: #0a4f7a;
+      background: #e6f2ff;
+    }
+
+    .camera-status-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 8px 0 10px;
+    }
+
+    .camera-status-row .pill {
+      margin-right: 0;
+      margin-bottom: 0;
+    }
+
+    .stepper {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .step-btn {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      padding: 8px 6px;
+      text-align: left;
+      font-weight: 700;
+      font-size: 13px;
+      color: #384152;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .step-btn.active {
+      color: #fff;
+      border-color: transparent;
+      background: linear-gradient(120deg, var(--primary), var(--primary-2));
+    }
+
+    .step-btn.locked {
+      opacity: 0.45;
+      pointer-events: none;
+      cursor: not-allowed;
+    }
+
+    .panel.locked {
+      opacity: 0.4;
+      pointer-events: none;
+      position: relative;
+    }
+
+    .panel.locked::after {
+      content: '🔒 Đang trong buổi tập';
+      position: absolute;
+      top: 10px;
+      right: 14px;
+      font-size: 12px;
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    button.danger {
+      background: linear-gradient(120deg, #c0392b, #e74c3c);
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      background: var(--line);
+      border-radius: 8px;
+      height: 22px;
+      overflow: hidden;
+      margin: 10px 0;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), #27ae60);
+      border-radius: 8px;
+      transition: width 0.4s ease;
+      display: flex;
+      align-items: center;
+      padding-left: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      min-width: 0;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--panel);
+      padding: 14px;
+      box-shadow: 0 3px 14px rgba(24, 35, 44, 0.06);
+      margin-bottom: 14px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    h2 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    h3 {
+      margin: 0 0 8px;
+      font-size: 15px;
+      color: #324057;
+    }
+
+    p {
+      margin: 0 0 10px;
+      color: var(--muted);
+    }
+
+    label {
+      display: block;
+      margin: 8px 0 4px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px;
+      background: #fff;
+      color: var(--ink);
+      font-family: inherit;
+    }
+
+    textarea {
+      min-height: 68px;
+      resize: vertical;
+    }
+
+    input[type="checkbox"] {
+      width: auto;
+      margin-right: 7px;
+      transform: scale(1.12);
+    }
+
+    input[type="range"] {
+      accent-color: var(--primary);
+      padding: 0;
+    }
+
+    /* Dual-thumb Range Slider CSS */
+    .range-slider-wrapper {
+      position: relative;
+      width: 100%;
+      height: 36px;
+      margin-top: 10px;
+      margin-bottom: 20px;
+    }
+
+    .range-slider-track {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 8px;
+      background: var(--line);
+      border-radius: 4px;
+      transform: translateY(-50%);
+    }
+
+    .range-slider-fill {
+      position: absolute;
+      top: 50%;
+      height: 8px;
+      background: var(--primary);
+      transform: translateY(-50%);
+      border-radius: 4px;
+      pointer-events: none;
+    }
+
+    .range-slider-input {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      transform: translateY(-50%);
+      -webkit-appearance: none;
+      appearance: none;
+      background: none;
+      pointer-events: none;
+    }
+
+    .range-slider-input::-webkit-slider-thumb {
+      height: 20px;
+      width: 20px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid var(--primary);
+      cursor: pointer;
+      -webkit-appearance: none;
+      pointer-events: auto;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .range-slider-input::-moz-range-thumb {
+      height: 20px;
+      width: 20px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid var(--primary);
+      cursor: pointer;
+      pointer-events: auto;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Keep inputs above the track */
+    .range-slider-input {
+      z-index: 2;
+    }
+
+    /* But if thumbs overlap, make whoever is clicked pop to top via JS */
+    .range-slider-input:active {
+      z-index: 3;
+    }
+
+    .trim-label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .row2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .row3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 9px;
+      color: #fff;
+      padding: 9px 12px;
+      cursor: pointer;
+      font-weight: 700;
+      background: linear-gradient(120deg, var(--primary), var(--primary-2));
+    }
+
+    button.secondary {
+      background: linear-gradient(120deg, #7d8699, #5f6778);
+    }
+
+    button.warn {
+      background: linear-gradient(120deg, #b36c00, var(--danger));
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
+      gap: 10px;
+    }
+
+    .card-item {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      padding: 10px;
+    }
+
+    .card-item h4 {
+      margin: 0 0 5px;
+      font-size: 15px;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .step-item {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .step-item-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    video {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: #000;
+      margin-top: 8px;
+    }
+
+    pre {
+      margin: 10px 0 0;
+      min-height: 120px;
+      max-height: 230px;
+      overflow: auto;
+      border-radius: 10px;
+      background: #101723;
+      color: #cde8ff;
+      padding: 10px;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .step-config.hidden,
+    .analysis-results.hidden {
+      display: none;
+    }
+
+    .analysis-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .analysis-card {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      background: #fff;
+    }
+
+    .skeleton-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .skeleton-player {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: linear-gradient(180deg, #f7fbff, #eef7ef);
+      padding: 8px;
+    }
+
+    .video-stage {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      overflow: hidden;
+      border-radius: 8px;
+      background: #fdfbf4;
+      border: 1px solid #d9d7cf;
+    }
+
+    .video-stage video,
+    .video-stage canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .video-stage video {
+      object-fit: contain;
+      background: #000;
+    }
+
+    .video-stage canvas {
+      pointer-events: none;
+    }
+
+    .joint-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 12px;
+    }
+
+    .joint-table th,
+    .joint-table td {
+      border-bottom: 1px solid var(--line);
+      padding: 6px 4px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    @media (max-width: 980px) {
+      .stepper {
+        grid-template-columns: 1fr;
+      }
+
+      .row2,
+      .row3 {
+        grid-template-columns: 1fr;
+      }
+
+      .skeleton-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <section class="hero">
+      <h1>Motion Coach - Kiểm thử Web PC</h1>
+      <p>Luyện tập rảnh tay cho 1 người 1 thiết bị: tự nhận tư thế chuẩn, đọc 3-2-1 để bắt đầu, đếm rep/giây trực tiếp,
+        và chờ bạn xác nhận sau mỗi set.</p>
+    </section>
+
+    <nav class="stepper">
+      <button class="step-btn active" data-step="1">1. Video mẫu</button>
+      <button class="step-btn" data-step="2">2. Kho bài tập</button>
+      <button class="step-btn" data-step="3">3. Chuẩn bị</button>
+      <button class="step-btn" data-step="4">4. Luyện tập</button>
+      <button class="step-btn" data-step="5">5. Phân tích</button>
+    </nav>
+
+    <section id="step1" class="panel">
+      <h2>Thêm video mẫu từ máy</h2>
+      <p>Chọn file video trong máy, xem thử ngay, sau đó lưu vào kho bài tập.</p>
+
+      <div class="row2">
+        <div>
+          <label>Tên bài tập</label>
+          <input id="tplName" value="squat">
+        </div>
+        <div>
+          <label>Kiểu bài tập</label>
+          <select id="tplMode">
+            <option value="reps">Đếm rep (reps)</option>
+            <option value="hold">Giữ tư thế (hold)</option>
+          </select>
+        </div>
+      </div>
+
+      <label>Chọn file video mẫu</label>
+      <input id="tplFile" type="file" accept="video/*">
+
+      <video id="localPreviewVideo" controls playsinline></video>
+
+      <div id="trimUI" class="hidden" style="margin-top: 14px;">
+        <div style="display: flex; justify-content: space-between;">
+          <div class="trim-label">Bắt đầu: <span id="trimStartLabel">0.0</span>s</div>
+          <div class="trim-label">Kết thúc: <span id="trimEndLabel">0.0</span>s</div>
+        </div>
+        <div class="range-slider-wrapper">
+          <div class="range-slider-track"></div>
+          <div class="range-slider-fill" id="trimSliderFill"></div>
+          <input type="range" id="tplTrimStart" class="range-slider-input" min="0" max="100" step="0.01" value="0">
+          <input type="range" id="tplTrimEnd" class="range-slider-input" min="0" max="100" step="0.01" value="100">
+        </div>
+      </div>
+
+      <label>Ghi chú</label>
+      <textarea id="tplNotes">Video mẫu động tác đơn lẻ.</textarea>
+
+      <div class="actions">
+        <button id="uploadAndCreateTplBtn">Tải lên và lưu bài tập</button>
+        <button class="secondary" id="refreshTplBtn">Làm mới kho</button>
+      </div>
+      <pre id="templateLog"></pre>
+    </section>
+
+    <section id="step2" class="panel hidden">
+      <h2>Kho bài tập</h2>
+      <p>Danh sách video mẫu đã lưu trên server. Bấm Xem video để mở.</p>
+
+      <div class="actions">
+        <button id="refreshLibBtn">Làm mới danh sách</button>
+      </div>
+
+      <div class="cards" id="libraryCards"></div>
+
+      <div style="margin-top:12px;">
+        <h3>Video mẫu đang xem</h3>
+        <div id="videoMeta" class="pill">Chưa chọn video</div>
+        <video id="previewVideo" controls playsinline></video>
+      </div>
+
+      <div style="margin-top:14px;">
+        <h3>Kho video sau phân tích</h3>
+        <p>Các video so khớp được sinh ra sau khi bạn bấm phân tích buổi tập.</p>
+        <div class="actions">
+          <button id="refreshAnalysisLibBtn">Làm mới kho phân tích</button>
+        </div>
+        <div class="cards" id="analysisLibraryCards"></div>
+      </div>
+
+      <pre id="libraryLog"></pre>
+    </section>
+
+    <!-- Step 3: Chuẩn bị giáo án -->
+    <section id="step3" class="panel hidden">
+      <h2>Chuẩn bị giáo án luyện tập</h2>
+      <p>Chọn bài tập, số set, số rep, rồi bấm bắt đầu để vào phiên luyện tập.</p>
+
+      <label><input type="checkbox" id="speakEnabledBackend">Đọc thông báo bằng loa backend</label>
+      <label><input type="checkbox" id="speakEnabledBrowser" checked>Đọc thông báo bằng giọng Việt trên thiết bị này</label>
+      <label><input type="checkbox" id="autoStartWhenReady" checked>Tự bắt đầu khi pose đã chuẩn (đếm ngược 3-2-1)</label>
+
+      <div id="stepsBox"></div>
+      <div class="actions">
+        <button id="addStepBtn">Thêm bài vào giáo án</button>
+        <button id="startWorkoutBtn">🏋️ Bắt đầu phiên luyện tập</button>
+      </div>
+      <pre id="startLog"></pre>
+    </section>
+
+    <!-- Step 4: Luyện tập trực tiếp -->
+    <section id="step4" class="panel hidden">
+      <h2>🎯 Luyện tập trực tiếp</h2>
+      <p>Hệ thống tự nhận tư thế chuẩn, đếm 3-2-1, và đếm rep/giây. Sau khi xong sẽ tự chuyển sang phân tích.</p>
+
+      <div class="camera-status-row">
+        <span class="pill" id="healthPill">Đang kiểm tra API...</span>
+        <span class="pill" id="sessionPill">Phiên: chưa có</span>
+        <span class="pill" id="cameraPill">Camera: tắt</span>
+        <span class="pill" id="matchPill">So khớp: --</span>
+      </div>
+      <div class="video-stage" style="width:min(100%, 760px);">
+        <video id="liveCamera" autoplay muted playsinline></video>
+        <canvas id="liveCameraOverlay" width="360" height="480"></canvas>
+      </div>
+
+      <h3 style="margin-top:14px;">Tín hiệu và tương tác</h3>
+      <div class="row3">
+        <div>
+          <label>Signal hiện tại (auto từ camera)</label>
+          <input id="signalInput" type="range" min="0" max="1" step="0.01" value="0.2">
+          <div>Giá trị: <b id="signalValue">0.20</b></div>
+        </div>
+        <div>
+          <label>Readiness gate</label>
+          <label><input type="checkbox" id="readinessInput" checked>Cho phép hệ thống nhận pose chuẩn</label>
+        </div>
+        <div>
+          <label>Tự động gửi frame</label>
+          <div class="actions">
+            <button id="autoStartBtn">Bắt đầu auto</button>
+            <button class="secondary" id="autoStopBtn">Dừng auto</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="sendFrameBtn">Gửi 1 frame</button>
+        <button class="warn" id="confirmBtn">Tiếp tục set/bài kế tiếp</button>
+        <button class="secondary" id="finalizeBtn">Kết thúc sớm và phân tích</button>
+        <button class="danger" id="cancelWorkoutBtn">❌ Hủy buổi tập</button>
+      </div>
+
+      <div class="row2" style="align-items:start; margin-top:14px;">
+        <div>
+          <h3>Pose mẫu (debug)</h3>
+          <div class="actions" style="margin-bottom:6px;">
+            <button class="secondary" id="debugTemplateFullscreenBtn" type="button">Phóng to video mẫu</button>
+            <label style="margin-top:8px;"><input type="checkbox" id="flipSideDirection" checked>Đảo nhãn trái/phải</label>
+          </div>
+          <div class="video-stage" id="debugTemplateStage" style="aspect-ratio: 16 / 9;">
+            <video id="debugTemplateVideo" controls controlslist="nofullscreen" playsinline muted loop preload="metadata"></video>
+            <canvas id="debugTemplateCanvas" width="640" height="360"></canvas>
+          </div>
+        </div>
+        <div>
+          <div id="debugTemplateMeta" class="pill">Chưa bắt đầu phiên tập</div>
+          <pre id="debugTemplateLog">Template debug: --</pre>
+        </div>
+      </div>
+
+      <canvas id="motionCanvas" width="64" height="36" class="hidden"></canvas>
+      <pre id="orientationDebug">Orientation debug: --</pre>
+      <pre id="frameLog"></pre>
+
+      <div class="actions" style="margin-top:8px;">
+        <button id="startCameraBtn" class="secondary">Bật camera</button>
+        <button class="secondary" id="stopCameraBtn">Tắt camera</button>
+      </div>
+    </section>
+
+    <!-- Step 5: Phân tích sau tập -->
+    <section id="step5" class="panel hidden">
+      <h2>📊 Phân tích sau tập</h2>
+      <p>Hệ thống đang so khớp video người tập với video mẫu (DTW). Vui lòng chờ.</p>
+
+      <div id="analysisProgressContainer">
+        <div id="analysisProgressText" style="font-weight:600; margin-bottom:6px;">Đang chuẩn bị...</div>
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill" id="analysisProgressBar" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <pre id="finalizeLog"></pre>
+      <div id="analysisResults" class="hidden" style="margin-top:14px;"></div>
+
+      <div class="actions" style="margin-top:14px;">
+        <button class="secondary" id="backToSetupBtn">↩ Quay lại Chuẩn bị giáo án</button>
+      </div>
+    </section>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+  <script src="/static/js/motion_core.js"></script>
+  <script type="module" src="/static/js/main.js?v=20260423d"></script>
+</body>
+
+</html>

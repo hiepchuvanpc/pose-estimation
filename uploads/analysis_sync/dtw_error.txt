@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "F:\ACV\new folder\APP2\app\src\motion_api\main.py", line 2664, in _render_sync_comparison_video
+    stats = build_synced_video(
+  File "F:\ACV\new folder\APP2\app\src\motion_api\sync_video_dtw.py", line 296, in build_synced_video
+    student_frame = student_reader.read_at(student_frame_no)
+  File "F:\ACV\new folder\APP2\app\src\motion_api\sync_video_dtw.py", line 40, in read_at
+    raise RuntimeError(f"Video has no frames: {self.path}")
+RuntimeError: Video has no frames: F:\ACV\new folder\APP2\app\uploads\5c0ad545-acf4-4629-800b-ab838547de78.webm

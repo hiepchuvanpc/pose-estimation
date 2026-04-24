@@ -1,0 +1,205 @@
+# Motion Coach App Starter
+
+Muc tieu: khoi tao app theo ly thuyet pose-based + readiness gate + DTW, toi uu de sau nay dua len mobile.
+
+## Nguyen tac kien truc
+
+- Domain-first: thuat toan nam trong motion_core, doc lap voi web/mobile.
+- API-thin: motion_api chi chuyen doi request/response, khong chua nghiep vu nang.
+- Contract-first: mobile va web dung chung API schema.
+- Exercise-agnostic: teacher la baseline, khong hard-code nguong static theo tung bai tap.
+
+## Cau truc
+
+- src/motion_core: thuat toan readiness + feature + DTW
+- src/motion_api: FastAPI endpoints
+- src/motion_api/persistence.py: SQLite store cho template/session/result
+- tests: unit test cho core logic
+- docs: architecture va mobile strategy
+
+## Persistence SQLite (production-oriented)
+
+- File DB mac dinh: `data/motion_coach.db`
+- Luu tru ben vung:
+   - templates
+   - template profiles
+   - workout sessions
+   - workout events
+   - workout segments
+   - workout final results
+- Ghi `workout_events` theo co che single-writer background queue (khong block luong realtime frame).
+- Theo doi trang thai queue qua endpoint: `GET /v1/system/persistence-health`.
+- Van giu co che doc JSON cu de migrate 1 lan khi DB trong.
+
+## Chay local voi conda qevd-fit300k
+
+1. Kich hoat env
+
+   conda activate qevd-fit300k
+
+2. Cai dat package
+
+   pip install -e .[dev]
+
+3. Chay API
+
+   uvicorn motion_api.main:app --reload
+
+4. Mo Swagger
+
+   http://127.0.0.1:8000/docs
+
+## Test luong tren Web PC
+
+1. Chay API:
+
+   conda activate qevd-fit300k
+   cd F:/ACV/slides/app
+   uvicorn motion_api.main:app --reload
+
+2. Mo trang test web:
+
+   http://127.0.0.1:8000/
+
+3. Thu tu test nhanh:
+
+- Bước 1: chọn video từ máy, tải lên và lưu template
+- Bước 2: vào kho bài tập, bấm xem video đã lưu
+- Bước 3: bật camera thiết bị, bắt đầu workout, nhận thông báo realtime
+- Bấm Confirm sau mỗi quãng nghỉ/chuyển bài
+- Kết thúc buổi xong mới bấm "Kết thúc buổi và phân tích sau tập"
+
+Trang web nay giup test end-to-end tren PC truoc khi lam mobile UI.
+
+## API bo sung cho web moi
+
+- POST /v1/library/upload-video: upload video tu may, tra ve video_uri dang /uploads/...
+- POST /v1/workout/session/finalize: chi phan tich sau khi buoi tap ket thuc
+- PUT /v1/library/templates/{template_id}: sua template
+- DELETE /v1/library/templates/{template_id}: xoa template (chan xoa neu dang co session active)
+- GET /v1/workout/session/{session_id}/result: lay ket qua finalize da duoc persist trong SQLite
+- GET /v1/library/analysis-videos: lay kho video da sinh sau phan tich
+- DELETE /v1/library/analysis-videos/{video_id}?delete_file=true: xoa ban ghi (va xoa file video neu co)
+
+## Luu video so khop sau tap
+
+- Video so khop (comparison) duoc luu tai thu muc: `uploads/analysis_sync/`
+- API tra ve duong dan xem truc tiep qua static route: `/uploads/analysis_sync/<file>.mp4`
+
+## MediaPipe dung de dem rep/hold va so khop
+
+- Template profile:
+   - POST /v1/library/templates/{template_id}/profile
+   - Trich pose tu video mau bang MediaPipe, tao profile (mean, pc1, feature sequence).
+- Live webcam:
+   - Web dung MediaPipe Pose JS de lay landmarks theo tung frame.
+   - Signal dua tren projection theo profile + similarity voi feature tu template.
+   - Signal nay duoc gui vao /v1/workout/session/frame de dem rep/hold.
+   - Luong 1 nguoi 1 thiet bi: khi bam bat dau, he thong tu tim pose chuan, doc "3-2-1" bang giong Viet, sau do tu dong vao set.
+   - Trong khi tap: doc rep tung lan hoac doc giay giu tu the theo realtime.
+   - Ket thuc set: thong bao quay lai thiet bi de bam xac nhan.
+- Phan tich tong hop:
+   - Chi chay khi bam /v1/workout/session/finalize sau khi buoi tap ket thuc.
+
+## MediaPipe live camera (single person)
+
+- Script demo camera: chi theo doi 1 nguoi noi bat trong khung hinh (theo co che cua MediaPipe Pose).
+
+  python -m motion_api.live_mediapipe --camera 0
+
+- Nhan phim q de thoat.
+
+## Dong bo 2 video giao vien - hoc vien bang DTW
+
+- Script CLI tao 1 video merged tu:
+    - video giao vien (chi 1 rep mau)
+    - video hoc vien (nhieu rep)
+- He thong se:
+    - trich pose bang MediaPipe
+    - tach rep hoc vien theo phase signal tu profile giao vien
+    - DTW tung rep hoc vien voi rep mau giao vien
+    - xuat 1 video duy nhat, trong do moi rep hoc vien duoc canh theo giao vien
+
+Lenh chay:
+
+   python -m motion_api.sync_video_dtw \
+      --teacher-video "F:/ACV/slides/samples/teacher_one_rep.mp4" \
+      --student-video "F:/ACV/slides/samples/student_multi_rep.mp4" \
+      --output "F:/ACV/slides/uploads/analysis_sync/student_vs_teacher_dtw.mp4"
+
+Tham so bo sung:
+
+- --frame-stride: lay pose moi N frame (mac dinh 1)
+- --max-frames-per-rep: gioi han so frame render moi rep sau khi co DTW path (mac dinh 140)
+
+## Endpoint dau tien
+
+- POST /v1/readiness: tinh readiness truoc khi so khop
+- POST /v1/align: tinh DTW distance giua 2 chuoi
+
+## Endpoint live cho rep/hold va nhieu bai lien tiep
+
+- POST /v1/live/session/start
+   - Input: danh sach bai tap va muc tieu, vi du reps hoac hold seconds.
+- POST /v1/live/session/frame
+   - Input: signal [0..1] va timestamp_ms.
+   - Output: rep_count hoac hold_seconds, completed, next_exercise, done.
+
+Signal [0..1] de cap nhat tracker nen duoc tinh tu do tuong dong voi teacher theo phase trong pipeline cua ban.
+
+## Workflow de xuat (theo dung y tuong cua ban)
+
+1. Nap thu vien dong tac don le
+- Moi template la 1 video chi chua 1 loai dong tac: tu the dau, mot vai rep, va ket thuc.
+- Goi POST /v1/library/templates voi name + mode + video_uri.
+
+2. Tao buoi tap theo thu tu tuy chon
+- Goi POST /v1/workout/session/start voi danh sach step:
+   - template_id
+   - sets
+   - reps_per_set hoac hold_seconds_per_set
+   - rest_seconds_between_sets
+- Co tuy chon speak_enabled=true de doc thong bao qua loa.
+
+3. Chay live tung frame
+- Goi POST /v1/workout/session/frame voi:
+   - signal [0..1]
+   - timestamp_ms
+   - readiness_passed (true/false)
+- He thong tra ve rep/hold, trang thai phase, va thong bao can doc.
+
+4. Xac nhan sau moi lan nghi / ket thuc bai
+- Goi POST /v1/workout/session/confirm
+- Muc tieu: nguoi tap vua nghi xong se vao lai pose chuan, tranh nham bai khi live.
+
+## TTS thong bao ra loa ngoai
+
+- Backend dung pyttsx3 (offline) de doc thong bao khi speak_enabled=true.
+- Cac thong bao bao gom:
+   - Dem rep (Rep 1, Rep 2, ...)
+   - Nhac canh bao readiness/pose
+   - Bat dau/ket thuc set
+   - Chuyen bai tiep theo
+
+### De backend dung giọng Microsoft An (Vietnamese)
+
+- Kiem tra backend dang thay voice nao:
+
+   GET http://127.0.0.1:8000/v1/tts/voices
+
+- Neu chua co Microsoft An trong ket qua, chay script bridge OneCore -> SAPI5 (PowerShell Administrator):
+
+   powershell -ExecutionPolicy Bypass -File scripts/enable_an_vi_voice.ps1
+
+- Khoi dong lai app, goi lai /v1/tts/voices de xac nhan da co voice An.
+
+Luu y: pyttsx3 tren Windows dung SAPI5 Desktop tokens, nen co the khong tu thay voice OneCore neu chua bridge.
+
+Goi y cho mobile: van nen hien thi text tren UI song song voi TTS de nguoi tap de theo doi trong moi truong on ao.
+
+## Lo trinh tiep theo
+
+- Dong bo keypoint schema voi pipeline pose estimator thuc te.
+- Them endpoint feedback theo phase sau khi canh DTW.
+- Them luu tru session (teacher template, student attempts).
+- Them auth + telemetry + model/version metadata.

@@ -1,0 +1,13 @@
+{
+  "items": [
+    {
+      "template_id": "aad729c0-b92a-4968-be75-ead6a984472f",
+      "name": "squat",
+      "mode": "reps",
+      "video_uri": "/uploads/template_frozen/template_aad729c0-b92a-4968-be75-ead6a984472f_bd69a980.mp4",
+      "notes": "Video mẫu động tác đơn lẻ.",
+      "trim_start_sec": null,
+      "trim_end_sec": null
+    }
+  ]
+}
