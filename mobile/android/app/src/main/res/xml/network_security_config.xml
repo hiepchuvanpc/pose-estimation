@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Production: Only HTTPS, no cleartext traffic -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <!-- Trust system certificates -->
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+    
+    <!-- Debug/Development: Allow localhost HTTP for testing -->
+    <domain-config cleartextTrafficPermitted="true">
+        <!-- Local development servers -->
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">127.0.0.1</domain>
+        <domain includeSubdomains="true">10.0.2.2</domain> <!-- Android emulator -->
+        <domain includeSubdomains="true">192.168.1.100</domain> <!-- Local network -->
+        <domain includeSubdomains="true">192.168.1.101</domain>
+    </domain-config>
+    
+    <!-- Note: In production builds, consider removing domain-config 
+         or using separate configs for debug/release builds -->
+</network-security-config>

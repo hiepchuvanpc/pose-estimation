@@ -1,0 +1,36 @@
+{
+  "template_id": "reverse_lunge",
+  "video_file": "reverse_lunge.mp4",
+  "total_frames": 180,
+  "fps": 30,
+  "duration_seconds": 6.0,
+  "feature_dim": 14,
+  "pca": {
+    "mean": [45.2, 42.8, 135.6, 132.4, 98.5, 95.2, 75.8, 78.3, 0.85, 0.88, 1.2, 1.18, 1.45, 1.42],
+    "pc1": [0.31, 0.29, -0.42, -0.38, 0.15, 0.18, 0.22, 0.24, 0.08, 0.09, -0.12, -0.11, 0.19, 0.17],
+    "proj_min": -2.85,
+    "proj_max": 3.42,
+    "explained_variance": 0.72
+  },
+  "thresholds": {
+    "peak": 0.82,
+    "valley": 0.23,
+    "peak_count": 3,
+    "valley_count": 3
+  },
+  "signals": [
+    0.15, 0.18, 0.22, 0.28, 0.35, 0.42, 0.51, 0.58, 0.65, 0.72, 0.78, 0.82, 0.84, 0.83, 0.79,
+    0.73, 0.65, 0.58, 0.49, 0.41, 0.34, 0.28, 0.23, 0.21, 0.22, 0.25, 0.29, 0.35, 0.42, 0.49,
+    0.58, 0.66, 0.73, 0.79, 0.84, 0.86, 0.85, 0.82, 0.77, 0.70, 0.62, 0.54, 0.45, 0.38, 0.31,
+    0.26, 0.22, 0.20, 0.21, 0.24, 0.28, 0.34, 0.41, 0.49, 0.57, 0.65, 0.72, 0.78, 0.83, 0.86,
+    0.87, 0.85, 0.81, 0.75, 0.68, 0.60, 0.51, 0.43, 0.36, 0.29, 0.24, 0.21, 0.19
+  ],
+  "rep_events": [
+    {"type": "peak", "frame": 42, "timestamp": 1.4, "value": 0.86},
+    {"type": "valley", "frame": 69, "timestamp": 2.3, "value": 0.21},
+    {"type": "peak", "frame": 105, "timestamp": 3.5, "value": 0.87},
+    {"type": "valley", "frame": 132, "timestamp": 4.4, "value": 0.19},
+    {"type": "peak", "frame": 168, "timestamp": 5.6, "value": 0.85}
+  ],
+  "notes": "SAMPLE calibration data - replace with actual processed data after running process_templates.py"
+}

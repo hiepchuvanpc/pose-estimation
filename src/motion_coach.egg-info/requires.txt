@@ -1,0 +1,12 @@
+fastapi>=0.115.0
+uvicorn>=0.30.0
+pydantic>=2.8.0
+mediapipe==0.10.33
+opencv-python>=4.10.0
+protobuf<5,>=4.25.3
+numpy>=1.26.0
+pyttsx3>=2.90
+python-multipart>=0.0.9
+
+[dev]
+pytest>=8.3.0

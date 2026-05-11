@@ -1,0 +1,88 @@
+name: motion_coach
+description: "AI Fitness Coach - On-device MediaPipe Pose Estimation"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+  # Camera
+  camera: ^0.11.0+2
+
+  # On-device MediaPipe Pose
+  google_mlkit_pose_detection: ^0.12.0
+
+  # HTTP networking
+  http: ^1.4.0
+
+  # State management - Riverpod (replacing Provider)
+  flutter_riverpod: ^2.5.1
+  riverpod_annotation: ^2.3.5
+
+  # Video player for template preview
+  video_player: ^2.9.0
+
+  # Text-to-speech
+  flutter_tts: ^4.2.0
+
+  # File paths
+  path_provider: ^2.1.0
+
+  # Permissions
+  permission_handler: ^11.3.0
+
+  # Local storage
+  shared_preferences: ^2.3.0
+  flutter_secure_storage: ^9.2.2
+
+  # Database - Drift (SQLite)
+  drift: ^2.18.0
+  sqlite3_flutter_libs: ^0.5.24
+
+  # Dependency Injection
+  get_it: ^7.7.0
+
+  # Utils
+  uuid: ^4.4.2
+  equatable: ^2.0.5
+  dartz: ^0.10.1
+  connectivity_plus: ^6.0.3
+  path: ^1.9.0
+  battery_plus: ^6.0.3
+
+  # Authentication
+  google_sign_in: ^6.2.1
+
+  # Google Drive API
+  googleapis: ^13.2.0
+
+  # Image/Video picker
+  image_picker: ^1.1.2
+
+  # Video compression/trimming (lightweight alternative)
+  # Note: FFmpeg Kit discontinued - using native approach for now
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+  # Database code generation
+  drift_dev: ^2.18.0
+  build_runner: ^2.4.11
+
+  # Riverpod code generation
+  riverpod_generator: ^2.4.0
+  custom_lint: ^0.6.4
+  riverpod_lint: ^2.3.10
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/templates/

@@ -1,0 +1,31 @@
+{
+  "items": [
+    {
+      "template_id": "aad729c0-b92a-4968-be75-ead6a984472f",
+      "name": "squat",
+      "mode": "reps",
+      "video_uri": "/uploads/template_frozen/template_aad729c0-b92a-4968-be75-ead6a984472f_bd69a980.mp4",
+      "notes": "Video mẫu động tác đơn lẻ.",
+      "trim_start_sec": null,
+      "trim_end_sec": null
+    },
+    {
+      "template_id": "c920d7a8-02f6-4e28-9ec2-0d370f0c96cd",
+      "name": "push up",
+      "mode": "reps",
+      "video_uri": "/uploads/template_frozen/template_c920d7a8-02f6-4e28-9ec2-0d370f0c96cd_0598ddd3.mp4",
+      "notes": "Video mẫu động tác đơn lẻ.",
+      "trim_start_sec": null,
+      "trim_end_sec": null
+    },
+    {
+      "template_id": "69695f4a-9bad-4e99-a0ee-a4b914eb887e",
+      "name": "lunge",
+      "mode": "reps",
+      "video_uri": "/uploads/template_frozen/template_69695f4a-9bad-4e99-a0ee-a4b914eb887e_1eff59d1.mp4",
+      "notes": "Video mẫu động tác đơn lẻ.",
+      "trim_start_sec": null,
+      "trim_end_sec": null
+    }
+  ]
+}
